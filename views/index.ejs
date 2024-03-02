@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Express Sequelize Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<style>
+  /* styles.css */
+
+body {
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  width: 80%;
+  display: flex;
+}
+
+.form-container {
+  flex: 1;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.articles-container {
+  flex: 1;
+  padding: 20px;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-container label {
+  margin-bottom: 8px;
+}
+
+.form-container input,
+.form-container textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-container button {
+  padding: 10px 15px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.article-box {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: height 0.3s;
+}
+
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ccc;
+}
+
+.article-header h3 {
+  margin: 0;
+}
+
+.expand-btn {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.article-details {
+  padding: 10px;
+}
+
+.expanded {
+  height: auto;
+}
+
+.comments-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.comment {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.delete-comment-btn,
+.delete-article-btn {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+
+.delete-comment-btn:hover,
+.delete-article-btn:hover {
+  background-color: #bd2130;
+}
+</style>
+  <div class="container">
+    <div class="form-container">
+      <h1>Add Article</h1>
+      <form action="/articles" method="post">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" required></textarea>
+
+        <button type="submit">Add Article</button>
+      </form>
+    </div>
+
+    <div class="articles-container">
+      <h1>Articles</h1>
+      <div class="accordion" id="accordionExample">
+        <% for (let index = 0; index < articles.length; index++) { %>
+          <% const article = articles[index]; %>
+          <div class="card article-box">
+            <div class="card-header" id="heading<%= index %>">
+              <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse<%= index %>" aria-expanded="true" aria-controls="collapse<%= index %>">
+                  <%= article.title %>
+                </button>
+              </h5>
+            </div>
+    
+            <div id="collapse<%= index %>" class="collapse" aria-labelledby="heading<%= index %>" data-parent="#accordionExample">
+              <div class="card-body">
+                <p>Author: <%= article.author %></p>
+                <p><%= article.content %></p>
+                <form action="/comments/<%= article.id %>" method="post">
+                  <label for="comment">Add Comment:</label>
+                  <input type="text" id="comment" name="text" required>
+                  <button type="submit">Add Comment</button>
+                </form>
+                <ul class="comments-list">
+                  <% for (let i = 0; i < article.Comments.length; i++) { %>
+                    <% const comment = article.Comments[i]; %>
+                    <li class="comment d-flex align-items-center justify-content-between">
+                      <div>
+                        <p><%= comment.text %></p>
+                      </div>
+                      <div class="ml-2">
+                        <a href="/comments/<%= comment.id %>">
+                          <button type="button" class="btn btn-danger delete-comment-btn">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </a>
+                      </div>
+                    </li>
+                  <% } %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+  </div>
+
+
+  
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</body>
+</html>
